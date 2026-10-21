@@ -310,7 +310,7 @@ const PALACE = [
 
 /* ---------- Assets (drop PNGs into assets/ with these names) ---------- */
 const ASSET_GROUPS = [
-  ['Клетки и поле', [['cell_normal','256×222','обычная клетка'],['cell_gold','256×222','золотая плитка'],['bg_episode','2560×1440','фон эпизода за полем, горизонтальный']]],
+  ['Клетки и поле', [['cell_normal','ширина 256','обычная клетка, высота по картинке с толщиной'],['cell_gold','ширина 256','золотая плитка'],['bg_episode','2560×1440','фон эпизода за полем, горизонтальный']]],
   ['Фишки', Object.entries(TYPES).flatMap(([k,t]) => [['chip_'+k,'160×160',t.name],['chip_'+k+'_selected','160×160',t.name+' в цепочке (необязательно)']])],
   ['Особые фишки', [['coin','140×140','монета, цифра номинала рисуется кодом'],['bolt_v','160×160','молния по вертикали'],['bolt_d1','160×160','молния по диагонали /'],['bolt_d2','160×160','молния по диагонали \\'],['bolt_star','160×160','молния во все стороны'],['bolt_area','160×160','удар по площади'],['gem_red','150×150','красный самоцвет']]],
   ['Препятствия', [['mono_2','220×220','монолит целый'],['mono_1','220×220','монолит с трещинами'],['stone_hades','220×220','камень из Аида'],['rope','220×220','верёвка поверх фишки']]],
@@ -546,7 +546,8 @@ function drawRopeAt(c, x, y){
 }
 function drawCell(c, cl, x, y, rad){
   const img = cl.gold ? IMG.cell_gold : IMG.cell_normal;
-  if (img){ c.drawImage(img, x-rad, y-SQ3*rad/2, rad*2, SQ3*rad); return; }
+  // artwork keeps its own proportions: top face aligned to the hex, the slab's thickness hangs below
+  if (img){ const dw=rad*2*0.98, dh=dw*img.height/img.width; c.drawImage(img, x-dw/2, y-dw*SQ3/4, dw, dh); return; }
   if (cl.gold){
     hexPath(x,y,rad*.95,c); const g=c.createLinearGradient(x,y-rad,x,y+rad); g.addColorStop(0,'#f2c86a'); g.addColorStop(1,'#a8711f'); c.fillStyle=g; c.fill();
     c.lineWidth=rad*.05; c.strokeStyle='#6d4511'; c.stroke();
@@ -612,7 +613,8 @@ function draw(now, dt){
   if (!lvl) return;
   eachCell((c,q,r) => { hexPath(px(q),py(q,r),R*1.16); ctx.fillStyle='rgba(42,71,96,.9)'; ctx.fill(); });
   eachCell((c,q,r) => { hexPath(px(q),py(q,r),R*1.07); ctx.fillStyle='rgba(8,18,27,.92)'; ctx.fill(); });
-  eachCell((c,q,r) => drawCell(ctx, c, px(q), py(q,r), R));
+  const byRow=[]; eachCell((c,q,r)=>byRow.push([c,q,r])); byRow.sort((m,n)=>py(m[1],m[2])-py(n[1],n[2]));
+  byRow.forEach(([c,q,r]) => drawCell(ctx, c, px(q), py(q,r), R));
   const inChain = new Set((chain||[]).map(p=>p[0]+','+p[1]));
   if (hintPath && !chain){ const a=.35+.35*Math.sin(now/220); hintPath.forEach(([q,r]) => { hexPath(px(q),py(q,r),R*.9); ctx.strokeStyle=`rgba(255,240,190,${a})`; ctx.lineWidth=R*.1; ctx.stroke(); }); }
   if (targetMode){ eachCell((c,q,r) => { if (validTarget(c.item)){ hexPath(px(q),py(q,r),R*.9); ctx.strokeStyle='rgba(255,226,140,.55)'; ctx.lineWidth=R*.07; ctx.stroke(); } }); }
