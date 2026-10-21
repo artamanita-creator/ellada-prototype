@@ -34,30 +34,47 @@ html,body{height:100%}
 body{background:var(--night);color:var(--ink);font-family:var(--body);font-size:15px;overflow:hidden;-webkit-tap-highlight-color:transparent}
 button{font:inherit;color:inherit;cursor:pointer}
 button:focus-visible,summary:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
-#app{height:100%;max-width:640px;margin:0 auto;display:grid;grid-template-rows:auto 1fr auto;padding-inline:16px;box-sizing:border-box;position:relative}
+#app{height:100%;display:grid;grid-template-columns:clamp(140px,17vw,210px) minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);column-gap:14px;padding-inline:16px;padding-block:10px 14px;box-sizing:border-box;position:relative}
 
-/* HUD */
-.hud{display:flex;align-items:stretch;gap:10px;padding-block:12px 6px}
-.hud-btn{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:0 12px;font-size:13px;font-weight:600;letter-spacing:.04em;color:var(--mute)}
-.goal{flex:1;min-width:0;display:flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:6px 12px 6px 6px}
-.goal canvas{width:40px;height:40px;flex:none}
+/* Top bar: map button · score · helper medallions · coins */
+.topbar{grid-column:1 / -1;display:flex;align-items:center;gap:14px;padding-block:0 10px;min-width:0}
+.hud-btn{align-self:stretch;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:0 14px;font-size:13px;font-weight:600;letter-spacing:.04em;color:var(--mute)}
+.stats{display:grid;gap:0;min-width:90px}
+.score{font-family:var(--display);font-size:24px;line-height:1;font-variant-numeric:tabular-nums}
+.score-label{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--mute)}
+.coins{margin-left:auto;display:flex;align-items:center;gap:8px;font-weight:800;font-size:18px;font-variant-numeric:tabular-nums;color:var(--gold);background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:6px 14px}
+.coin-dot{width:18px;height:18px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff3c4,var(--gold) 55%,var(--gold-deep));box-shadow:0 0 0 1px rgba(0,0,0,.3)}
+.coins.bump{animation:bump .35s}
+@keyframes bump{50%{transform:scale(1.15)}}
+
+/* Left column: goal, caryatid holding the timer column, level tag */
+.side{display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:12px;min-height:0}
+.goal{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:8px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:8px}
+.goal canvas{width:40px;height:40px}
 .goal-text{min-width:0;display:grid}
-.goal-label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.goal-val{font-family:var(--display);font-size:26px;line-height:1;font-variant-numeric:tabular-nums}
-.goal-steps{display:flex;gap:4px;margin-left:auto}
+.goal-label{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);line-height:1.2}
+.goal-val{font-family:var(--display);font-size:28px;line-height:1;font-variant-numeric:tabular-nums}
+.goal-steps{grid-column:1 / -1;display:flex;gap:5px;justify-content:center}
+.goal-steps:empty{display:none}
 .goal-steps i{width:8px;height:8px;border-radius:50%;background:var(--line)}
 .goal-steps i.done{background:var(--ok)}
 .goal-steps i.cur{background:var(--gold)}
-.limit{display:grid;place-items:center;min-width:66px;background:radial-gradient(circle at 50% 35%,#f6efe0,#cfc4ad);color:#2a2116;border-radius:14px;padding:4px 8px;box-shadow:inset 0 -3px 0 rgba(0,0,0,.18)}
+.caryatid{position:relative;min-height:0;display:grid;grid-template-rows:auto auto minmax(0,1fr) auto;justify-items:center;background:linear-gradient(90deg,#1a2f40,#22394c 50%,#1a2f40);border-radius:16px;padding:10px 0 12px;border:1px solid var(--line)}
+.car-head{width:46%;aspect-ratio:1/1.15;border-radius:50% 50% 44% 44%;background:radial-gradient(circle at 45% 35%,#f4eee2,#b9ae98);box-shadow:inset 0 -6px 10px rgba(0,0,0,.18)}
+.car-capital{width:72%;height:16px;margin-top:6px;border-radius:6px;background:linear-gradient(#efe8da,#bfb4a0);position:relative}
+.car-capital::before,.car-capital::after{content:"";position:absolute;top:2px;width:16px;height:16px;border-radius:50%;background:radial-gradient(circle,#efe8da 30%,#a99e88 32% 45%,#efe8da 47%)}
+.car-capital::before{left:-8px}.car-capital::after{right:-8px}
+.column{position:relative;width:36%;min-height:60px;height:100%;background:linear-gradient(90deg,#d9d1c0,#f2ece0 45%,#c9bfaa);border-radius:4px;overflow:hidden;box-shadow:inset 0 0 0 3px rgba(0,0,0,.06)}
+.column::before{content:"";position:absolute;inset:6px;border-radius:3px;background:#0f2230}
+.column i{position:absolute;left:6px;right:6px;bottom:6px;height:100%;border-radius:2px;background:linear-gradient(90deg,#3d8fd0,#8fd0ff 50%,#3d8fd0);transition:height .4s;max-height:calc(100% - 12px)}
+.column.low i{background:linear-gradient(90deg,#c65a33,#ffb08a 50%,#c65a33)}
+.limit{display:grid;place-items:center;margin-top:-26px;z-index:1;width:72px;height:72px;border-radius:50%;background:radial-gradient(circle at 50% 35%,#f6efe0,#cfc4ad);color:#2a2116;box-shadow:0 4px 10px rgba(0,0,0,.4),inset 0 -3px 0 rgba(0,0,0,.18)}
 .limit-val{font-family:var(--display);font-size:30px;line-height:1;font-variant-numeric:tabular-nums}
-.limit-label{font-size:10px;letter-spacing:.1em;text-transform:uppercase;opacity:.7}
+.limit-label{font-size:9px;letter-spacing:.1em;text-transform:uppercase;opacity:.7;margin-top:-10px}
 .limit.low{background:radial-gradient(circle at 50% 35%,#ffd9c8,#e0805c)}
-.stats{display:grid;align-content:center;justify-items:end;gap:2px;min-width:70px}
-.score{font-family:var(--display);font-size:20px;font-variant-numeric:tabular-nums}
-.coins{display:flex;align-items:center;gap:6px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--gold)}
-.coin-dot{width:16px;height:16px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff3c4,var(--gold) 55%,var(--gold-deep));box-shadow:0 0 0 1px rgba(0,0,0,.3)}
-.coins.bump{animation:bump .35s}
-@keyframes bump{50%{transform:scale(1.25)}}
+.caryatid.has-art{background:url(assets/caryatid.png) center/contain no-repeat;border-color:transparent}
+.caryatid.has-art .car-head,.caryatid.has-art .car-capital{visibility:hidden}
+.lvl-tag{text-align:center;font-family:var(--display);font-size:20px;color:var(--marble);background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:4px 0}
 
 /* Stage */
 #stage{position:relative;min-height:0;background-size:cover;background-position:center;border-radius:18px}
@@ -69,33 +86,37 @@ button:focus-visible,summary:focus-visible{outline:2px solid var(--gold);outline
 .target-hint{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);background:var(--gold);color:#2a1d08;font-weight:800;border-radius:999px;padding:6px 14px;font-size:13px;white-space:nowrap}
 
 /* Tutorial bubble */
-.bubble{position:absolute;left:8px;right:8px;top:8px;display:flex;gap:12px;align-items:flex-start;background:linear-gradient(#f3ecdc,#e2d6bc);color:#2b2216;border-radius:16px;padding:12px;box-shadow:0 10px 30px rgba(0,0,0,.45);z-index:5}
+.bubble{position:absolute;left:50%;transform:translateX(-50%);width:min(560px,calc(100% - 16px));box-sizing:border-box;top:8px;display:flex;gap:12px;align-items:flex-start;background:linear-gradient(#f3ecdc,#e2d6bc);color:#2b2216;border-radius:16px;padding:12px;box-shadow:0 10px 30px rgba(0,0,0,.45);z-index:5}
 .bubble canvas{width:52px;height:52px;flex:none}
 .bubble-body{flex:1;min-width:0;display:grid;gap:8px}
 .bubble-name{font-family:var(--display);font-size:20px;line-height:1}
 .bubble-text{line-height:1.45;font-size:14px}
 .bubble button{justify-self:end;background:#2b2216;color:var(--marble);border:0;border-radius:10px;padding:7px 14px;font-weight:700}
 
-/* Helpers */
-.helpers{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding-block:8px 14px}
-.helper{position:relative;display:grid;justify-items:center;gap:4px;background:none;border:0;padding:4px 0;color:var(--ink)}
-.medal{position:relative;width:62px;height:62px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--gold) calc(var(--p,0)*1%),rgba(255,255,255,.08) 0)}
-.medal canvas{width:54px;height:54px;border-radius:50%}
-.helper-name{font-family:var(--display);font-size:17px;line-height:1}
-.helper-ab{font-size:11px;color:var(--mute);text-align:center;line-height:1.3}
-.helper.ready .medal{box-shadow:0 0 0 2px var(--gold),0 0 22px rgba(227,178,79,.75);animation:pulse 1.4s infinite}
+/* Helpers live in the top bar, like the god ovals in the original */
+.helpers{display:flex;gap:10px;margin-inline:auto}
+.helper{position:relative;display:flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:4px 14px 4px 4px;color:var(--ink)}
+.medal{position:relative;width:50px;height:50px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--gold) calc(var(--p,0)*1%),rgba(255,255,255,.08) 0);flex:none}
+.medal canvas{width:43px;height:43px;border-radius:50%}
+.helper-txt{display:grid;text-align:left}
+.helper-name{font-family:var(--display);font-size:18px;line-height:1}
+.helper-ab{font-size:11px;color:var(--mute);line-height:1.25;max-width:120px}
+.helper.ready{border-color:var(--gold)}
+.helper.ready .medal{box-shadow:0 0 0 2px var(--gold),0 0 18px rgba(227,178,79,.75);animation:pulse 1.4s infinite}
 .helper.locked{opacity:.38;cursor:default}
+.helper.active{border-color:var(--marble)}
 .helper.active .medal{box-shadow:0 0 0 3px var(--marble)}
 @keyframes pulse{50%{transform:scale(1.06)}}
 
 /* Screens and modal */
 .screen{position:absolute;inset:0;background:var(--night);overflow-y:auto;z-index:20;padding-inline:16px}
-.screen-inner{max-width:640px;margin:0 auto;padding-block:20px 40px;display:grid;gap:18px}
+.screen-inner{max-width:1040px;margin:0 auto;padding-block:20px 40px;display:grid;gap:18px}
 .brand{display:grid;gap:4px}
 .brand h1{font-family:var(--display);font-weight:400;font-size:clamp(40px,11vw,60px);line-height:.95;margin:0;letter-spacing:.02em;color:var(--marble)}
 .brand p{margin:0;color:var(--mute)}
 .eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
 .levels{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.screen-inner > .palace-card,.screen-inner > .settings,.screen-inner > details{max-width:640px}
 .lvl{display:grid;gap:6px;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px}
 .lvl-n{font-family:var(--display);font-size:30px;line-height:1;color:var(--gold)}
 .lvl-name{font-weight:700}
@@ -136,7 +157,9 @@ summary{cursor:pointer;font-weight:700}
 .modal-btns button.primary{background:#2b2216;color:var(--marble)}
 
 .palace-view{width:100%;aspect-ratio:3/2;max-width:100%;border-radius:16px;display:block;background:var(--panel)}
-.stages{display:grid;gap:10px}
+.stages{display:grid;gap:10px;align-content:start}
+.palace-layout{display:grid;gap:16px}
+@media (min-width:900px){.palace-layout{grid-template-columns:minmax(0,3fr) minmax(260px,2fr);align-items:start}}
 .stage{display:grid;gap:8px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px}
 .stage-top{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
 .stage-name{font-family:var(--display);font-size:22px}
@@ -149,22 +172,42 @@ summary{cursor:pointer;font-weight:700}
 .flycoin{position:fixed;width:22px;height:22px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff3c4,var(--gold) 55%,var(--gold-deep));z-index:40;pointer-events:none;transition:transform .6s cubic-bezier(.5,-0.3,.6,1),opacity .6s}
 
 @media (prefers-reduced-motion:reduce){.helper.ready .medal,.coins.bump{animation:none}.toast{animation-duration:2s}}
-@media (max-width:420px){.hud{gap:6px}.limit{min-width:56px}.stats{min-width:56px}.helper-ab{display:none}}
+@media (max-width:1100px){.helper-ab{display:none}}
+@media (max-width:760px){.helper-txt{display:none}.helper{padding:3px}.stats{min-width:0}.score{font-size:20px}}
+/* Portrait phones: the game is built for landscape; keep it playable and suggest rotating */
+.rotate-note{display:none}
+@media (orientation:portrait) and (max-width:760px){
+  #app{grid-template-columns:1fr;grid-template-rows:auto auto minmax(0,1fr) auto}
+  .side{grid-template-rows:none;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;padding-block:0 8px}
+  .caryatid{display:contents}.car-head,.car-capital,.column{display:none}
+  .limit{margin:0;width:58px;height:58px}
+  .rotate-note{display:block;grid-column:1 / -1;text-align:center;font-size:12px;color:var(--mute);padding-top:6px}
+}
 </style>
 
 </head>
 <body>
 <div id="app">
-  <header class="hud">
+  <header class="topbar">
     <button class="hud-btn" id="btnMap" aria-label="Карта уровней">Карта</button>
+    <div class="stats"><span class="score" id="scoreVal">0</span><span class="score-label">очки</span></div>
+    <div class="helpers" id="helpers"></div>
+    <span class="coins" id="coinsBox" aria-label="Монеты"><span class="coin-dot"></span><span id="coinVal">0</span></span>
+  </header>
+  <aside class="side">
     <div class="goal" id="goal">
       <canvas id="goalIcon" width="80" height="80"></canvas>
       <div class="goal-text"><span class="goal-label" id="goalLabel">Золото</span><span class="goal-val" id="goalVal">0</span></div>
       <div class="goal-steps" id="goalSteps"></div>
     </div>
-    <div class="limit" id="limit"><span class="limit-val" id="limitVal">0</span><span class="limit-label" id="limitLabel">ходов</span></div>
-    <div class="stats"><span class="score" id="scoreVal">0</span><span class="coins" id="coinsBox"><span class="coin-dot"></span><span id="coinVal">0</span></span></div>
-  </header>
+    <div class="caryatid" id="caryatid">
+      <div class="car-head"></div>
+      <div class="car-capital"></div>
+      <div class="column" id="column"><i id="limitFill"></i></div>
+      <div class="limit" id="limit"><span class="limit-val" id="limitVal">0</span><span class="limit-label" id="limitLabel">ходов</span></div>
+    </div>
+    <div class="lvl-tag" id="lvlTag">1-1</div>
+  </aside>
   <main id="stage">
     <canvas id="board"></canvas>
     <div class="chainbar" id="chainbar" hidden></div>
@@ -174,7 +217,7 @@ summary{cursor:pointer;font-weight:700}
       <div class="bubble-body"><div class="bubble-name" id="bubbleName"></div><div class="bubble-text" id="bubbleText"></div><button id="bubbleBtn">Дальше</button></div>
     </div>
   </main>
-  <footer class="helpers" id="helpers"></footer>
+  <p class="rotate-note">Игра рассчитана на горизонтальный экран: поверните телефон.</p>
 
   <section class="screen" id="mapScreen">
     <div class="screen-inner">
@@ -200,8 +243,10 @@ summary{cursor:pointer;font-weight:700}
     <div class="screen-inner">
       <button class="link-btn back" id="palaceBack">← К уровням</button>
       <div class="brand"><span class="eyebrow">Монеты: <span id="bankVal">0</span></span><h1>Дворец</h1></div>
-      <canvas class="palace-view" id="palaceCanvas" width="1200" height="800"></canvas>
-      <div class="stages" id="stageList"></div>
+      <div class="palace-layout">
+        <canvas class="palace-view" id="palaceCanvas" width="1200" height="800"></canvas>
+        <div class="stages" id="stageList"></div>
+      </div>
     </div>
   </section>
 
@@ -265,10 +310,11 @@ const PALACE = [
 
 /* ---------- Assets (drop PNGs into assets/ with these names) ---------- */
 const ASSET_GROUPS = [
-  ['Клетки и поле', [['cell_normal','256×222','обычная клетка'],['cell_gold','256×222','золотая плитка'],['bg_episode','1440×2560','фон эпизода (за полем)']]],
+  ['Клетки и поле', [['cell_normal','256×222','обычная клетка'],['cell_gold','256×222','золотая плитка'],['bg_episode','2560×1440','фон эпизода за полем, горизонтальный']]],
   ['Фишки', Object.entries(TYPES).flatMap(([k,t]) => [['chip_'+k,'160×160',t.name],['chip_'+k+'_selected','160×160',t.name+' в цепочке (необязательно)']])],
   ['Особые фишки', [['coin','140×140','монета, цифра номинала рисуется кодом'],['bolt_v','160×160','молния по вертикали'],['bolt_d1','160×160','молния по диагонали /'],['bolt_d2','160×160','молния по диагонали \\'],['bolt_star','160×160','молния во все стороны'],['bolt_area','160×160','удар по площади'],['gem_red','150×150','красный самоцвет']]],
   ['Препятствия', [['mono_2','220×220','монолит целый'],['mono_1','220×220','монолит с трещинами'],['stone_hades','220×220','камень из Аида'],['rope','220×220','верёвка поверх фишки']]],
+  ['Интерфейс', [['caryatid','300×900','кариатида-рамка таймера; колонну с водой поверх рисует игра']]],
   ['Портреты', [['portrait_zeus','256×256','Зевс'],['portrait_icarus','256×256','Икар'],['portrait_jason','256×256','Ясон']]],
   ['Дворец (слои 1200×800 с прозрачностью)', [['palace_base','1200×800','небо, холм, фундамент'],['palace_columns_a','1200×800','колонны дорические'],['palace_columns_b','1200×800','колонны ионические'],['palace_stairs_a','1200×800','лестница мраморная'],['palace_stairs_b','1200×800','лестница с перилами'],['palace_frieze_a','1200×800','фриз терракотовый'],['palace_frieze_b','1200×800','фриз лазурный']]],
 ];
@@ -281,6 +327,7 @@ ASSET_NAMES.forEach(n => {
 });
 function onAssetsChanged(){
   if (IMG.bg_episode) $('stage').style.backgroundImage = 'url(assets/bg_episode.png)';
+  $('caryatid').classList.toggle('has-art', !!IMG.caryatid);
   renderAssetList(); renderHelpers(); if (!$('palaceScreen').hidden) renderPalace();
 }
 
@@ -353,6 +400,7 @@ function startLevel(i){
   $('mapScreen').hidden = true; $('palaceScreen').hidden = true; hideModal();
   resize(); renderHelpers(); updateHUD();
   paused = false;
+  $('bubble').hidden = true;
   if (!P.seen[i]) showTutorial(lvl.tut, () => { P.seen[i]=true; save(); });
 }
 
@@ -746,7 +794,7 @@ function renderHelpers(){
     const ch = on ? (S.charge[key]||0) : 0;
     const b=document.createElement('button'); b.className='helper'+(on?'':' locked')+(on&&ch>=H.need?' ready':'')+(targetMode===key?' active':'');
     b.setAttribute('aria-label', on ? `${H.name}: ${H.ability}, заряд ${ch} из ${H.need}` : `${H.name} откроется на уровне ${H.from_level}`);
-    b.innerHTML=`<span class="medal" style="--p:${on?Math.round(ch/H.need*100):0}"><canvas width="108" height="108"></canvas></span><span class="helper-name">${H.name}</span><span class="helper-ab">${on ? H.ability : 'с уровня '+H.from_level}</span>`;
+    b.innerHTML=`<span class="medal" style="--p:${on?Math.round(ch/H.need*100):0}"><canvas width="96" height="96"></canvas></span><span class="helper-txt"><span class="helper-name">${H.name}</span><span class="helper-ab">${on ? H.ability : 'с уровня '+H.from_level}</span></span>`; b.title = on ? `${H.ability} · ${ch}/${H.need}` : `Откроется на уровне ${H.from_level}`;
     drawPortrait(b.querySelector('canvas'), key);
     if (on) b.addEventListener('click', () => useHelper(key));
     box.appendChild(b);
@@ -812,7 +860,11 @@ function updateLimit(){
   const v = t ? Math.ceil(S.time) : S.moves;
   $('limitVal').textContent = v;
   $('limitLabel').textContent = t ? 'секунд' : (v%10===1&&v%100!==11 ? 'ход' : (v%10>=2&&v%10<=4&&(v%100<10||v%100>=20)) ? 'хода' : 'ходов');
-  $('limit').classList.toggle('low', t ? v<=10 : v<=5);
+  const low = t ? v<=10 : v<=5;
+  $('limit').classList.toggle('low', low); $('column').classList.toggle('low', low);
+  const total = t ? lvl.moves*7 : lvl.moves;
+  $('limitFill').style.height = Math.max(0, Math.min(100, v/total*100)) + '%';
+  $('lvlTag').textContent = '1-' + (lvlIdx+1);
 }
 let lastCharge='';
 function renderHelpersCharge(){ const sig=JSON.stringify(S.charge)+targetMode; if (sig!==lastCharge){ lastCharge=sig; renderHelpers(); } }
@@ -947,7 +999,9 @@ function drawPalace(c){
 /* ---------- Boot ---------- */
 renderHelpers();
 openMap();
-window.__ellada = {state:()=>({S, lvlIdx, busy, P}), findMove, center:(q,r)=>[px(q),py(q,r)], start:startLevel, useHelper, grid:()=>grid};
+window.__ellada = {state:()=>({S, lvlIdx, busy, P}), findMove, center:(q,r)=>[px(q),py(q,r)], start:startLevel, useHelper, grid:()=>grid,
+  draw:{ cell:drawCell, chip:drawChipAt, coin:drawCoinAt, bolt:drawBoltAt, gem:drawGemAt, portrait:drawPortrait, palace:drawPalace, P:()=>P,
+    withR:(r,fn)=>{ const s=R; R=r; try{ fn(); } finally { R=s; } }, mono:drawMonoAt, stone:drawStoneAt, rope:drawRopeAt, TYPES } };
 window.addEventListener('keydown', e => { if (e.key==='Escape' && targetMode){ targetMode=null; $('targetHint').hidden=true; renderHelpers(); } });
 })();
 </script>
